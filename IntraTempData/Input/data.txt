@@ -1,0 +1,4 @@
+PrimaryKey	Item	Value
+20191231	meat	300
+20191231	vegetable	500
+20191231	snack	1000
