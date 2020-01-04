@@ -73,15 +73,20 @@ def GetInputData(arglstInFile, argPrimKey):
         # 複数行データの初期化
         lstLines = []
 
-        if strExt == ".txt":
-            # テキストファイルの読み込み
-            lstLines = GetInputFromText(file)
-        elif strExt == ".csv":
-            # CSVファイルの読み込み
-            lstLines = GetInputFromCsv(file)
-        elif strExt == ".xlsx":
-            # Excelファイルの読み込み(xls不可)
-            lstLines = GetInputFromXlsxWithOpenpyxl(file, argPrimKey)
+        if strExt in (".txt", ".csv", ".xlsx"):
+            print("Inputファイル「%s」の読み込みを始めます" % file)
+
+            if strExt == ".txt":
+                # テキストファイルの読み込み
+                lstLines = GetInputFromText(file)
+            elif strExt == ".csv":
+                # CSVファイルの読み込み
+                lstLines = GetInputFromCsv(file)
+            elif strExt == ".xlsx":
+                # Excelファイルの読み込み(xls不可)
+                lstLines = GetInputFromXlsxWithOpenpyxl(file, argPrimKey)
+
+            print("Inputファイル「%s」を読み込みました" % file)
 
         if len(lstLines) > 0:
             retLstInRec.append(lstLines)
@@ -387,7 +392,7 @@ if __name__ == "__main__":
         exit(1)
 
     # 入力ファイルメッセージの出力
-    printFileList("Inputファイル「%s」を読み込みました", lstInFiles)
+    #printFileList("Inputファイル「%s」を読み込みました", lstInFiles)
 
     # テンプレートファイルの収集
     lstTempFileName = listTempFileName()
@@ -405,6 +410,7 @@ if __name__ == "__main__":
     lstInAllLine = GetInputData(lstInFiles, COL_PRIM)
     # テンプレートファイルの中身を一次配列に格納
     lstTempAllLine = GetTempData(lstTempFileName)
+    #lstTempAllLine = GetInputData(lstTempFileName, COL_PRIM)
 
     # 入力データ配列をPrimaryKeyをもとに辞書配列に変換
     dicInRecord = MakeInputRecords(lstInAllLine, lstInFiles)
@@ -426,6 +432,7 @@ if __name__ == "__main__":
     # print(lstTempAllLine)
     # print(lstTempFileName)
 
+    # 出力ファイル
     lstOutFileName = []
     lstOutAllLine = []
 
@@ -437,12 +444,15 @@ if __name__ == "__main__":
             # 出力データ(1ファイル分)
             lstOutFileLine = []
 
-            # 出力ファイル名の生成（テンプレート＋PrimaryKey）
-            strFile = ConvTempToOutFile(lstTempFileName[idxFile], key)
-            lstOutFileName.append(strFile)
-            # lstOutFile.append(lstTempFiles[idxFile] + "_" + key)
+            # 出力フラグ
+            flgOut = False
 
-            # print("file:", strFile,"mainKey",key)
+            # # 出力ファイル名の生成（テンプレート＋PrimaryKey）
+            # strOutFile = ConvTempToOutFile(lstTempFileName[idxFile], key)
+            # lstOutFileName.append(strOutFile)
+            # # lstOutFile.append(lstTempFiles[idxFile] + "_" + key)
+            #
+            # # print("file:", strFile,"mainKey",key)
 
             # テンプレートの行データ毎のループ処理
             # strTemp: 行データ
@@ -489,6 +499,7 @@ if __name__ == "__main__":
                                 pass
                             else:
                                 newWord = value[keyWord]
+                                flgOut = True
 
                             # print("key=",oldWord, newWord)
 
@@ -517,9 +528,17 @@ if __name__ == "__main__":
                     pass
 
             # 出力データ(全ファイル)に登録
-            if len(lstOutFileLine) > 0:
+            if flgOut == True and len(lstOutFileLine) > 0:
                 # print("lstOutFileLine",lstOutFileLine)
                 lstOutAllLine.append(lstOutFileLine)
+
+                # 出力ファイル名の生成（テンプレート＋PrimaryKey）
+                strOutFile = ConvTempToOutFile(lstTempFileName[idxFile], key)
+                lstOutFileName.append(strOutFile)
+                # lstOutFile.append(lstTempFiles[idxFile] + "_" + key)
+
+                # print("file:", strFile,"mainKey",key)
+
 
     # print(lstOutFileName)
     # print(lstOutAllLine)
